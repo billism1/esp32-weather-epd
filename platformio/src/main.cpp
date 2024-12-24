@@ -26,6 +26,7 @@
 #endif
 
 #if USE_AHT
+#include <Adafruit_BMP280.h>
 #include <Adafruit_AHTX0.h>
 #endif
 
@@ -295,6 +296,7 @@ void setup()
 
   float inTemp     = NAN;
   float inHumidity = NAN;
+  float inPressure = NAN;
 
 #if USE_BME
 
@@ -342,15 +344,17 @@ void setup()
   digitalWrite(PIN_AHT_PWR, HIGH);
   delay(300);
 
-  Serial.println("I2C_aht.begin(PIN_AHT_SDA, PIN_AHT_SCL);... ");
-  TwoWire I2C_aht = TwoWire(0);
-  I2C_aht.begin(PIN_AHT_SDA, PIN_AHT_SCL, 100000); // 100kHz
+  Serial.println("I2C_aht_bmp.begin(PIN_AHT_SDA, PIN_AHT_SCL);... ");
+  TwoWire I2C_aht_bmp = TwoWire(0);
+  I2C_aht_bmp.begin(PIN_AHT_SDA, PIN_AHT_SCL, 100000); // 100kHz
 
   Serial.println(String(TXT_READING_FROM) + " AHT20+BMP280... ");
   Adafruit_AHTX0 aht;
-  if(aht.begin(&I2C_aht, 0, AHT_ADDRESS))
+  Adafruit_BMP280 bmp = Adafruit_BMP280(&I2C_aht_bmp);
+
+  if(aht.begin(&I2C_aht_bmp, 0, AHT_ADDRESS))
   {
-    Serial.println("AHT20+BMP280 found.");
+    Serial.println("AHT20 found.");
 
     sensors_event_t humidity, temp;
     aht.getEvent(&humidity, &temp);
@@ -358,13 +362,16 @@ void setup()
     inTemp     = temp.temperature; // Celsius
     inHumidity = humidity.relative_humidity;
 
+    Serial.print("Temperature reading (*C): "); Serial.println(inTemp);
+    Serial.print("Humidity reading (%rH): "); Serial.println(inHumidity);
+
     // check if readings are valid
     // note: readings are checked again before drawing to screen. If a reading
     //       is not a number (NAN) then an error occurred, a dash '-' will be
     //       displayed.
     if (std::isnan(inTemp) || std::isnan(inHumidity))
     {
-      statusStr = "AHT20+BMP280 " + String(TXT_READ_FAILED);
+      statusStr = "AHT20 " + String(TXT_READ_FAILED);
       Serial.println(statusStr);
     }
     else
@@ -374,12 +381,32 @@ void setup()
   }
   else
   {
-    statusStr = "AHT20+BMP280 " + String(TXT_NOT_FOUND); // check wiring
+    statusStr = "AHT20 " + String(TXT_NOT_FOUND); // check wiring
+    Serial.println(statusStr);
+  }
+
+  if(bmp.begin(BMP_ADDRESS))
+  {
+    Serial.println("BMP280 found.");
+
+    inPressure = bmp.readPressure();
+    float inPressureHg = inPressure * 0.0002953; // Convert Pa to inHg
+    float inPressurePsi = inPressure * 0.000145038; // Convert Pa to Psi
+    Serial.print("Pressure reading (Pa): "); Serial.println(inPressure);
+    Serial.print("Pressure reading (inHg): "); Serial.println(inPressureHg);
+    Serial.print("Pressure reading (psi): "); Serial.println(inPressurePsi);
+
+    // TODO: Display pressure other than in status bar area.
+    statusStr += " Pressure: " + String(inPressureHg) + " inHg (" + String(inPressurePsi) + " psi)"; // check wiring
+  }
+  else
+  {
+    statusStr = "BMP280 " + String(TXT_NOT_FOUND); // check wiring
     Serial.println(statusStr);
   }
 
   digitalWrite(PIN_AHT_PWR, LOW);
-  Serial.println("Init AHT20+BMP280, done.");
+  Serial.println("Done with AHT20+BMP280.");
 #endif
 
   String refreshTimeStr;

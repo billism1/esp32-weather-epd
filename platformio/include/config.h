@@ -276,6 +276,7 @@ extern const uint8_t PIN_AHT_SDA;
 extern const uint8_t PIN_AHT_SCL;
 extern const uint8_t PIN_AHT_PWR;
 extern const uint8_t AHT_ADDRESS;
+extern const uint8_t BMP_ADDRESS;
 extern const char *WIFI_SSID;
 extern const char *WIFI_PASSWORD;
 extern const unsigned long WIFI_TIMEOUT;

@@ -47,6 +47,7 @@ const uint8_t PIN_AHT_SDA = 8;
 const uint8_t PIN_AHT_SCL = 9;
 const uint8_t PIN_AHT_PWR = 13;   // Irrelevant if directly connected to 3.3V
 const uint8_t AHT_ADDRESS = 0x38;
+const uint8_t BMP_ADDRESS = 0x77;
 
 // WIFI
 const char *WIFI_SSID     = "The Multiverse";
