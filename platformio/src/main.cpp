@@ -15,9 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#define USE_BME 0
+#define USE_AHT 1
+
 #include <Arduino.h>
+
+#if USE_BME
 #include <Adafruit_BME280.h>
 #include <Adafruit_Sensor.h>
+#endif
+
+#if USE_AHT
+#include <Adafruit_AHTX0.h>
+#endif
+
 #include <Preferences.h>
 #include <time.h>
 #include <WiFi.h>
@@ -127,7 +138,7 @@ void setup()
   printHeapUsage();
 #endif
 
-  disableBuiltinLED();
+  // disableBuiltinLED();
 
   // Open namespace for read/write to non-volatile storage
   prefs.begin(NVS_NAMESPACE, false);
@@ -282,11 +293,15 @@ void setup()
   }
   killWiFi(); // WiFi no longer needed
 
+  float inTemp     = NAN;
+  float inHumidity = NAN;
+
+#if USE_BME
+
   // GET INDOOR TEMPERATURE AND HUMIDITY, start BME280...
   pinMode(PIN_BME_PWR, OUTPUT);
   digitalWrite(PIN_BME_PWR, HIGH);
-  float inTemp     = NAN;
-  float inHumidity = NAN;
+
   Serial.print(String(TXT_READING_FROM) + " BME280... ");
   TwoWire I2C_bme = TwoWire(0);
   Adafruit_BME280 bme;
@@ -317,6 +332,55 @@ void setup()
     Serial.println(statusStr);
   }
   digitalWrite(PIN_BME_PWR, LOW);
+
+#endif
+
+#if USE_AHT
+
+  // GET INDOOR TEMPERATURE AND HUMIDITY, start AHT20+BMP280...
+  pinMode(PIN_AHT_PWR, OUTPUT);
+  digitalWrite(PIN_AHT_PWR, HIGH);
+  delay(300);
+
+  Serial.println("I2C_aht.begin(PIN_AHT_SDA, PIN_AHT_SCL);... ");
+  TwoWire I2C_aht = TwoWire(0);
+  I2C_aht.begin(PIN_AHT_SDA, PIN_AHT_SCL, 100000); // 100kHz
+
+  Serial.println(String(TXT_READING_FROM) + " AHT20+BMP280... ");
+  Adafruit_AHTX0 aht;
+  if(aht.begin(&I2C_aht, 0, AHT_ADDRESS))
+  {
+    Serial.println("AHT20+BMP280 found.");
+
+    sensors_event_t humidity, temp;
+    aht.getEvent(&humidity, &temp);
+
+    inTemp     = temp.temperature; // Celsius
+    inHumidity = humidity.relative_humidity;
+
+    // check if readings are valid
+    // note: readings are checked again before drawing to screen. If a reading
+    //       is not a number (NAN) then an error occurred, a dash '-' will be
+    //       displayed.
+    if (std::isnan(inTemp) || std::isnan(inHumidity))
+    {
+      statusStr = "AHT20+BMP280 " + String(TXT_READ_FAILED);
+      Serial.println(statusStr);
+    }
+    else
+    {
+      Serial.println(TXT_SUCCESS);
+    }
+  }
+  else
+  {
+    statusStr = "AHT20+BMP280 " + String(TXT_NOT_FOUND); // check wiring
+    Serial.println(statusStr);
+  }
+
+  digitalWrite(PIN_AHT_PWR, LOW);
+  Serial.println("Init AHT20+BMP280, done.");
+#endif
 
   String refreshTimeStr;
   getRefreshTimeStr(refreshTimeStr, timeConfigured, &timeInfo);

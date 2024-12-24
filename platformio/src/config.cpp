@@ -29,23 +29,28 @@
 // ADC pin used to measure battery voltage
 const uint8_t PIN_BAT_ADC  = A2; // A0 for micro-usb firebeetle
 // Pins for E-Paper Driver Board
-const uint8_t PIN_EPD_BUSY = 14; // 5 for micro-usb firebeetle
-const uint8_t PIN_EPD_CS   = 13;
-const uint8_t PIN_EPD_RST  = 21;
-const uint8_t PIN_EPD_DC   = 22;
-const uint8_t PIN_EPD_SCK  = 18;
+const uint8_t PIN_EPD_BUSY = 4; // 5 for micro-usb firebeetle
+const uint8_t PIN_EPD_CS   = 10;
+const uint8_t PIN_EPD_RST  = 5;
+const uint8_t PIN_EPD_DC   = 6;
+const uint8_t PIN_EPD_SCK  = 12;
 const uint8_t PIN_EPD_MISO = 19; // 19 Master-In Slave-Out not used, as no data from display
-const uint8_t PIN_EPD_MOSI = 23;
-const uint8_t PIN_EPD_PWR  = 26; // Irrelevant if directly connected to 3.3V
+const uint8_t PIN_EPD_MOSI = 11;
+const uint8_t PIN_EPD_PWR  = 7; // Irrelevant if directly connected to 3.3V
 // I2C Pins used for BME280
-const uint8_t PIN_BME_SDA = 17;
-const uint8_t PIN_BME_SCL = 16;
-const uint8_t PIN_BME_PWR =  4;   // Irrelevant if directly connected to 3.3V
+const uint8_t PIN_BME_SDA = 8;
+const uint8_t PIN_BME_SCL = 9;
+const uint8_t PIN_BME_PWR = 13;   // Irrelevant if directly connected to 3.3V
 const uint8_t BME_ADDRESS = 0x76; // If sensor does not work, try 0x77
+// I2C Pins used for AHT20+BMP280
+const uint8_t PIN_AHT_SDA = 8;
+const uint8_t PIN_AHT_SCL = 9;
+const uint8_t PIN_AHT_PWR = 13;   // Irrelevant if directly connected to 3.3V
+const uint8_t AHT_ADDRESS = 0x38;
 
 // WIFI
-const char *WIFI_SSID     = "ssid";
-const char *WIFI_PASSWORD = "password";
+const char *WIFI_SSID     = "The Multiverse";
+const char *WIFI_PASSWORD = "beer is good 123";
 const unsigned long WIFI_TIMEOUT = 10000; // ms, WiFi connection timeout.
 
 // HTTP
@@ -58,7 +63,7 @@ const unsigned HTTP_CLIENT_TCP_TIMEOUT = 10000; // ms
 
 // OPENWEATHERMAP API
 // OpenWeatherMap API key, https://openweathermap.org/
-const String OWM_APIKEY   = "abcdefghijklmnopqrstuvwxyz012345";
+const String OWM_APIKEY   = "cc6057288d9ac59e230a5df8cc0f3f9e";
 const String OWM_ENDPOINT = "api.openweathermap.org";
 // OpenWeatherMap One Call 2.5 API is deprecated for all new free users
 // (accounts created after Summer 2022).
@@ -79,15 +84,15 @@ const String OWM_ONECALL_VERSION = "3.0";
 // LOCATION
 // Set your latitude and longitude.
 // (used to get weather data as part of API requests to OpenWeatherMap)
-const String LAT = "40.7128";
-const String LON = "-74.0060";
+const String LAT = "29.7283";
+const String LON = "-95.8613";
 // City name that will be shown in the top-right corner of the display.
-const String CITY_STRING = "New York";
+const String CITY_STRING = "CCR - Fulshear, TX";
 
 // TIME
 // For list of time zones see
 // https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
-const char *TIMEZONE = "EST5EDT,M3.2.0,M11.1.0";
+const char *TIMEZONE = "CST6CDT,M3.2.0,M11.1.0";
 // Time format used when displaying sunrise/set times. (Max 11 characters)
 // For more information about formatting see
 // https://man7.org/linux/man-pages/man3/strftime.3.html
@@ -118,7 +123,7 @@ const unsigned long NTP_TIMEOUT = 20000; // ms
 // Aligned to the nearest minute boundary.
 // For example, if set to 30 (minutes) the display will update at 00 or 30
 // minutes past the hour. (range: [2-1440])
-// Note: The OpenWeatherMap model is update every 10 minutes, so updating more
+// Note: The OpenWeatherMap model is updated every 10 minutes, so updating more
 //       frequently than that is unnessesary.
 const int SLEEP_DURATION = 30; // minutes
 // Bed Time Power Savings.
