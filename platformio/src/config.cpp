@@ -50,8 +50,8 @@ const uint8_t AHT_ADDRESS = 0x38;
 const uint8_t BMP_ADDRESS = 0x77;
 
 // WIFI
-const char *WIFI_SSID     = "The Multiverse";
-const char *WIFI_PASSWORD = "beer is good 123";
+const char *WIFI_SSID     = "XXXX";
+const char *WIFI_PASSWORD = "XXX";
 const unsigned long WIFI_TIMEOUT = 10000; // ms, WiFi connection timeout.
 
 // HTTP
@@ -64,7 +64,7 @@ const unsigned HTTP_CLIENT_TCP_TIMEOUT = 10000; // ms
 
 // OPENWEATHERMAP API
 // OpenWeatherMap API key, https://openweathermap.org/
-const String OWM_APIKEY   = "cc6057288d9ac59e230a5df8cc0f3f9e";
+const String OWM_APIKEY   = "XXXXX";
 const String OWM_ENDPOINT = "api.openweathermap.org";
 // OpenWeatherMap One Call 2.5 API is deprecated for all new free users
 // (accounts created after Summer 2022).
