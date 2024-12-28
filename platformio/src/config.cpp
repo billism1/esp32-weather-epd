@@ -18,6 +18,8 @@
 #include <Arduino.h>
 #include "config.h"
 
+#if defined(USE_BOARD_FIREBEETLE2)
+
 // PINS
 // The configuration below is intended for use with the project's official 
 // wiring diagrams using the FireBeetle 2 ESP32-E microcontroller board.
@@ -27,7 +29,63 @@
 //       functionality.
 //
 // ADC pin used to measure battery voltage
-const uint8_t PIN_BAT_ADC  = A2; // A0 for micro-usb firebeetle
+const uint8_t PIN_BAT_ADC  = A2; // A0 for micro-usb firebeetle (Circuitry built-in for firebeetle 2)
+// Pins for E-Paper Driver Board
+const uint8_t PIN_EPD_BUSY = 14; // 5 for micro-usb firebeetle
+const uint8_t PIN_EPD_CS   = 13;
+const uint8_t PIN_EPD_RST  = 21;
+const uint8_t PIN_EPD_DC   = 22;
+const uint8_t PIN_EPD_SCK  = 18;
+const uint8_t PIN_EPD_MISO = 19; // 19 Master-In Slave-Out not used, as no data from display
+const uint8_t PIN_EPD_MOSI = 23;
+const uint8_t PIN_EPD_PWR  = 26; // Irrelevant if directly connected to 3.3V
+// I2C Pins used for BME280
+const uint8_t PIN_BME_SDA = 17;
+const uint8_t PIN_BME_SCL = 16;
+const uint8_t PIN_BME_PWR =  4;   // Irrelevant if directly connected to 3.3V
+const uint8_t BME_ADDRESS = 0x76; // If sensor does not work, try 0x77
+// I2C Pins used for AHT20+BMP280
+const uint8_t PIN_AHT_SDA = 17;
+const uint8_t PIN_AHT_SCL = 16;
+const uint8_t PIN_AHT_PWR =  4;   // Irrelevant if directly connected to 3.3V
+const uint8_t AHT_ADDRESS = 0x38;
+const uint8_t BMP_ADDRESS = 0x77;
+
+#elif defined(USE_BOARD_HILETGO_LOLIN32)
+
+////////////////////////////////
+// Hiletgo ESP32 Lolin32 v.1.0.0
+////////////////////////////////
+// ADC pin used to measure battery voltage
+const uint8_t PIN_BAT_ADC  = A0; // A0 for micro-usb firebeetle and lolin32 boards (Extra circuitry needed if you want to use this)
+// Pins for E-Paper Driver Board
+const uint8_t PIN_EPD_BUSY = 14; // 5 for micro-usb firebeetle
+const uint8_t PIN_EPD_CS   = 13;
+const uint8_t PIN_EPD_RST  = 21;
+const uint8_t PIN_EPD_DC   = 22;
+const uint8_t PIN_EPD_SCK  = 18;
+const uint8_t PIN_EPD_MISO = 19; // 19 Master-In Slave-Out not used, as no data from display
+const uint8_t PIN_EPD_MOSI = 23;
+const uint8_t PIN_EPD_PWR  = 26; // Irrelevant if directly connected to 3.3V
+// I2C Pins used for BME280
+const uint8_t PIN_BME_SDA = 17;
+const uint8_t PIN_BME_SCL = 16;
+const uint8_t PIN_BME_PWR =  4;   // Irrelevant if directly connected to 3.3V
+const uint8_t BME_ADDRESS = 0x76; // If sensor does not work, try 0x77
+// I2C Pins used for AHT20+BMP280
+const uint8_t PIN_AHT_SDA = 17;
+const uint8_t PIN_AHT_SCL = 16;
+const uint8_t PIN_AHT_PWR =  4;   // Irrelevant if directly connected to 3.3V
+const uint8_t AHT_ADDRESS = 0x38;
+const uint8_t BMP_ADDRESS = 0x77;
+
+#elif defined(USE_BOARD_ESP32_S3_ZERO)
+
+////////////////
+// ESP32-S3-Zero
+////////////////
+// ADC pin used to measure battery voltage
+const uint8_t PIN_BAT_ADC  = A2; // A0 for micro-usb firebeetle (Extra circuitry needed if you want to use this)
 // Pins for E-Paper Driver Board
 const uint8_t PIN_EPD_BUSY = 4; // 5 for micro-usb firebeetle
 const uint8_t PIN_EPD_CS   = 10;
@@ -49,9 +107,14 @@ const uint8_t PIN_AHT_PWR = 13;   // Irrelevant if directly connected to 3.3V
 const uint8_t AHT_ADDRESS = 0x38;
 const uint8_t BMP_ADDRESS = 0x77;
 
+#else
+    #error "Define board in platformio.ini file!"
+#endif
+
+
 // WIFI
-const char *WIFI_SSID     = "XXXX";
-const char *WIFI_PASSWORD = "XXX";
+const char *WIFI_SSID     = "ssid here";
+const char *WIFI_PASSWORD = "passhrase here";
 const unsigned long WIFI_TIMEOUT = 10000; // ms, WiFi connection timeout.
 
 // HTTP
@@ -97,13 +160,13 @@ const char *TIMEZONE = "CST6CDT,M3.2.0,M11.1.0";
 // Time format used when displaying sunrise/set times. (Max 11 characters)
 // For more information about formatting see
 // https://man7.org/linux/man-pages/man3/strftime.3.html
-// const char *TIME_FORMAT = "%l:%M%P"; // 12-hour ex: 1:23am  11:00pm
-const char *TIME_FORMAT = "%H:%M";   // 24-hour ex: 01:23   23:00
+const char *TIME_FORMAT = "%l:%M%P"; // 12-hour ex: 1:23am  11:00pm
+// const char *TIME_FORMAT = "%H:%M";   // 24-hour ex: 01:23   23:00
 // Time format used when displaying axis labels. (Max 11 characters)
 // For more information about formatting see
 // https://man7.org/linux/man-pages/man3/strftime.3.html
-// const char *HOUR_FORMAT = "%l%P"; // 12-hour ex: 1am  11pm
-const char *HOUR_FORMAT = "%H";      // 24-hour ex: 01   23
+const char *HOUR_FORMAT = "%l%P"; // 12-hour ex: 1am  11pm
+// const char *HOUR_FORMAT = "%H";      // 24-hour ex: 01   23
 // Date format used when displaying date in top-right corner.
 // For more information about formatting see
 // https://man7.org/linux/man-pages/man3/strftime.3.html
@@ -112,7 +175,8 @@ const char *DATE_FORMAT = "%a, %B %e"; // ex: Sat, January 1
 // of the screen.
 // For more information about formatting see
 // https://man7.org/linux/man-pages/man3/strftime.3.html
-const char *REFRESH_TIME_FORMAT = "%x %H:%M";
+const char *REFRESH_TIME_FORMAT = "%x %l:%M%P";
+// const char *REFRESH_TIME_FORMAT = "%x %H:%M";
 // NTP_SERVER_1 is the primary time server, while NTP_SERVER_2 is a fallback.
 // pool.ntp.org will find the closest available NTP server to you.
 const char *NTP_SERVER_1 = "pool.ntp.org";

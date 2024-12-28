@@ -139,7 +139,9 @@ void setup()
   printHeapUsage();
 #endif
 
-  // disableBuiltinLED();
+#if DISABLE_LED
+    disableBuiltinLED();
+#endif
 
   // Open namespace for read/write to non-volatile storage
   prefs.begin(NVS_NAMESPACE, false);
