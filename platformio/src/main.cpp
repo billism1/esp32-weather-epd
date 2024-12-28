@@ -16,8 +16,7 @@
  */
 
 #include <Arduino.h>
-#include <Adafruit_BME280.h>
-#include <Adafruit_Sensor.h>
+
 #include <Preferences.h>
 #include <time.h>
 #include <WiFi.h>
@@ -30,11 +29,22 @@
 #include "display_utils.h"
 #include "icons/icons_196x196.h"
 #include "renderer.h"
+
 #if defined(USE_HTTPS_WITH_CERT_VERIF) || defined(USE_HTTPS_WITH_CERT_VERIF)
   #include <WiFiClientSecure.h>
 #endif
 #ifdef USE_HTTPS_WITH_CERT_VERIF
   #include "cert.h"
+#endif
+
+#if defined(USE_SENSOR_BME280)
+  #include <Adafruit_BME280.h>
+  #include <Adafruit_Sensor.h>
+#elif defined(USE_SENSOR_AHT20_PLUS_BMP280)
+  #include <Adafruit_BMP280.h>
+  #include <Adafruit_AHTX0.h>
+#else
+    #error "Define sensor to use!"
 #endif
 
 // too large to allocate locally on stack
@@ -127,7 +137,9 @@ void setup()
   printHeapUsage();
 #endif
 
-  disableBuiltinLED();
+#if DISABLE_LED
+    disableBuiltinLED();
+#endif
 
   // Open namespace for read/write to non-volatile storage
   prefs.begin(NVS_NAMESPACE, false);
@@ -282,11 +294,16 @@ void setup()
   }
   killWiFi(); // WiFi no longer needed
 
+  float inTemp     = NAN;
+  float inHumidity = NAN;
+  float inPressure = NAN;
+
+#if defined(USE_SENSOR_BME280)
+
   // GET INDOOR TEMPERATURE AND HUMIDITY, start BME280...
   pinMode(PIN_BME_PWR, OUTPUT);
   digitalWrite(PIN_BME_PWR, HIGH);
-  float inTemp     = NAN;
-  float inHumidity = NAN;
+
   Serial.print(String(TXT_READING_FROM) + " BME280... ");
   TwoWire I2C_bme = TwoWire(0);
   Adafruit_BME280 bme;
@@ -317,6 +334,81 @@ void setup()
     Serial.println(statusStr);
   }
   digitalWrite(PIN_BME_PWR, LOW);
+
+#elif defined(USE_SENSOR_AHT20_PLUS_BMP280)
+
+  // GET INDOOR TEMPERATURE AND HUMIDITY, start AHT20+BMP280...
+  pinMode(PIN_AHT_PWR, OUTPUT);
+  digitalWrite(PIN_AHT_PWR, HIGH);
+  delay(300);
+
+  Serial.println("I2C_aht_bmp.begin(PIN_AHT_SDA, PIN_AHT_SCL);... ");
+  TwoWire I2C_aht_bmp = TwoWire(0);
+  I2C_aht_bmp.begin(PIN_AHT_SDA, PIN_AHT_SCL, 100000); // 100kHz
+
+  Serial.println(String(TXT_READING_FROM) + " AHT20+BMP280... ");
+  Adafruit_AHTX0 aht;
+  Adafruit_BMP280 bmp = Adafruit_BMP280(&I2C_aht_bmp);
+
+  if(aht.begin(&I2C_aht_bmp, 0, AHT_ADDRESS))
+  {
+    Serial.println("AHT20 found.");
+
+    sensors_event_t humidity, temp;
+    aht.getEvent(&humidity, &temp);
+
+    inTemp     = temp.temperature; // Celsius
+    inHumidity = humidity.relative_humidity;
+
+    Serial.print("Temperature reading (*C): "); Serial.println(inTemp);
+    Serial.print("Humidity reading (%rH): "); Serial.println(inHumidity);
+
+    // check if readings are valid
+    // note: readings are checked again before drawing to screen. If a reading
+    //       is not a number (NAN) then an error occurred, a dash '-' will be
+    //       displayed.
+    if (std::isnan(inTemp) || std::isnan(inHumidity))
+    {
+      statusStr = "AHT20 " + String(TXT_READ_FAILED);
+      Serial.println(statusStr);
+    }
+    else
+    {
+      Serial.println(TXT_SUCCESS);
+    }
+  }
+  else
+  {
+    statusStr = "AHT20 " + String(TXT_NOT_FOUND); // check wiring
+    Serial.println(statusStr);
+  }
+
+  if(bmp.begin(BMP_ADDRESS))
+  {
+    Serial.println("BMP280 found.");
+
+    inPressure = bmp.readPressure();
+    float inPressureHg = inPressure * 0.0002953; // Convert Pa to inHg
+    float inPressurePsi = inPressure * 0.000145038; // Convert Pa to Psi
+    Serial.print("Pressure reading (Pa): "); Serial.println(inPressure);
+    Serial.print("Pressure reading (inHg): "); Serial.println(inPressureHg);
+    Serial.print("Pressure reading (psi): "); Serial.println(inPressurePsi);
+
+    // TODO: Display pressure other than in status bar area.
+    statusStr += " Pressure: " + String(inPressureHg) + " inHg (" + String(inPressurePsi) + " psi)"; // check wiring
+  }
+  else
+  {
+    statusStr = "BMP280 " + String(TXT_NOT_FOUND); // check wiring
+    Serial.println(statusStr);
+  }
+
+  digitalWrite(PIN_AHT_PWR, LOW);
+  Serial.println("Done with AHT20+BMP280.");
+
+#else
+    #error "Define sensor to use!"
+#endif
 
   String refreshTimeStr;
   getRefreshTimeStr(refreshTimeStr, timeConfigured, &timeInfo);

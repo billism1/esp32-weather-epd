@@ -24,6 +24,7 @@
 #include "api_response.h"
 #include "config.h"
 
+//   DISP_BW_V2 - 7.5in e-Paper (v2)      800x480px  Black/White
 #ifdef DISP_BW_V2
   #define DISP_WIDTH  800
   #define DISP_HEIGHT 480
@@ -31,6 +32,8 @@
   extern GxEPD2_BW<GxEPD2_750_T7,
                    GxEPD2_750_T7::HEIGHT> display;
 #endif
+
+//   DISP_3C_B  - 7.5in e-Paper (B)       800x480px  Red/Black/White
 #ifdef DISP_3C_B
   #define DISP_WIDTH  800
   #define DISP_HEIGHT 480
@@ -38,6 +41,8 @@
   extern GxEPD2_3C<GxEPD2_750c_Z08,
                    GxEPD2_750c_Z08::HEIGHT / 2> display;
 #endif
+
+//   DISP_7C_F  - 7.3in ACeP e-Paper (F)  800x480px  7-Color
 #ifdef DISP_7C_F
   #define DISP_WIDTH  800
   #define DISP_HEIGHT 480
@@ -45,6 +50,8 @@
   extern GxEPD2_7C<GxEPD2_730c_GDEY073D46, 
                    GxEPD2_730c_GDEY073D46::HEIGHT / 4> display;
 #endif
+
+//   DISP_BW_V1 - 7.5in e-Paper (v1)      640x384px  Black/White
 #ifdef DISP_BW_V1
   #define DISP_WIDTH  640
   #define DISP_HEIGHT 384

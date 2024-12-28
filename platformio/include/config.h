@@ -21,6 +21,9 @@
 #include <cstdint>
 #include <Arduino.h>
 
+//#define USE_SENSOR_BME280
+#define USE_SENSOR_AHT20_PLUS_BMP280
+
 // E-PAPER PANEL
 // This project supports the following E-Paper panels:
 //   DISP_BW_V2 - 7.5in e-Paper (v2)      800x480px  Black/White
@@ -28,8 +31,8 @@
 //   DISP_7C_F  - 7.3in ACeP e-Paper (F)  800x480px  7-Color
 //   DISP_BW_V1 - 7.5in e-Paper (v1)      640x384px  Black/White
 // Uncomment the macro that identifies your physical panel.
-#define DISP_BW_V2
-// #define DISP_3C_B
+// #define DISP_BW_V2
+#define DISP_3C_B
 // #define DISP_7C_F
 // #define DISP_BW_V1
 
@@ -236,6 +239,8 @@
 //   Disable alerts by changing the DISPLAY_ALERTS macro to 0.
 #define DISPLAY_ALERTS 1
 
+#define DISABLE_LED 1
+
 // STATUS BAR EXTRAS
 //   Extra information that can be displayed on the status bar. Set to 1 to
 //   enable.
@@ -272,6 +277,11 @@ extern const uint8_t PIN_BME_SDA;
 extern const uint8_t PIN_BME_SCL;
 extern const uint8_t PIN_BME_PWR;
 extern const uint8_t BME_ADDRESS;
+extern const uint8_t PIN_AHT_SDA;
+extern const uint8_t PIN_AHT_SCL;
+extern const uint8_t PIN_AHT_PWR;
+extern const uint8_t AHT_ADDRESS;
+extern const uint8_t BMP_ADDRESS;
 extern const char *WIFI_SSID;
 extern const char *WIFI_PASSWORD;
 extern const unsigned long WIFI_TIMEOUT;

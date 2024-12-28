@@ -18,6 +18,8 @@
 #include <Arduino.h>
 #include "config.h"
 
+#if defined(USE_BOARD_FIREBEETLE2)
+
 // PINS
 // The configuration below is intended for use with the project's official 
 // wiring diagrams using the FireBeetle 2 ESP32-E microcontroller board.
@@ -27,7 +29,7 @@
 //       functionality.
 //
 // ADC pin used to measure battery voltage
-const uint8_t PIN_BAT_ADC  = A2; // A0 for micro-usb firebeetle
+const uint8_t PIN_BAT_ADC  = A2; // A0 for micro-usb firebeetle (Circuitry built-in for firebeetle 2)
 // Pins for E-Paper Driver Board
 const uint8_t PIN_EPD_BUSY = 14; // 5 for micro-usb firebeetle
 const uint8_t PIN_EPD_CS   = 13;
@@ -35,17 +37,84 @@ const uint8_t PIN_EPD_RST  = 21;
 const uint8_t PIN_EPD_DC   = 22;
 const uint8_t PIN_EPD_SCK  = 18;
 const uint8_t PIN_EPD_MISO = 19; // 19 Master-In Slave-Out not used, as no data from display
-const uint8_t PIN_EPD_MOSI = 23;
+const uint8_t PIN_EPD_MOSI = 23; // DIN
 const uint8_t PIN_EPD_PWR  = 26; // Irrelevant if directly connected to 3.3V
 // I2C Pins used for BME280
 const uint8_t PIN_BME_SDA = 17;
 const uint8_t PIN_BME_SCL = 16;
 const uint8_t PIN_BME_PWR =  4;   // Irrelevant if directly connected to 3.3V
 const uint8_t BME_ADDRESS = 0x76; // If sensor does not work, try 0x77
+// I2C Pins used for AHT20+BMP280
+const uint8_t PIN_AHT_SDA = 17;
+const uint8_t PIN_AHT_SCL = 16;
+const uint8_t PIN_AHT_PWR =  4;   // Irrelevant if directly connected to 3.3V
+const uint8_t AHT_ADDRESS = 0x38;
+const uint8_t BMP_ADDRESS = 0x77;
+
+#elif defined(USE_BOARD_HILETGO_LOLIN32)
+
+////////////////////////////////
+// Hiletgo ESP32 Lolin32 v.1.0.0
+////////////////////////////////
+// ADC pin used to measure battery voltage
+const uint8_t PIN_BAT_ADC  = A0; // A0 for micro-usb firebeetle and lolin32 boards (Extra circuitry needed if you want to use this)
+// Pins for E-Paper Driver Board
+const uint8_t PIN_EPD_BUSY = 14; // 5 for micro-usb firebeetle
+const uint8_t PIN_EPD_CS   = 13;
+const uint8_t PIN_EPD_RST  = 21;
+const uint8_t PIN_EPD_DC   = 22;
+const uint8_t PIN_EPD_SCK  = 18;
+const uint8_t PIN_EPD_MISO = 19; // 19 Master-In Slave-Out not used, as no data from display
+const uint8_t PIN_EPD_MOSI = 23; // DIN
+const uint8_t PIN_EPD_PWR  = 26; // Irrelevant if directly connected to 3.3V
+// I2C Pins used for BME280
+const uint8_t PIN_BME_SDA = 17;
+const uint8_t PIN_BME_SCL = 16;
+const uint8_t PIN_BME_PWR =  4;   // Irrelevant if directly connected to 3.3V
+const uint8_t BME_ADDRESS = 0x76; // If sensor does not work, try 0x77
+// I2C Pins used for AHT20+BMP280
+const uint8_t PIN_AHT_SDA = 17;
+const uint8_t PIN_AHT_SCL = 16;
+const uint8_t PIN_AHT_PWR =  4;   // Irrelevant if directly connected to 3.3V
+const uint8_t AHT_ADDRESS = 0x38;
+const uint8_t BMP_ADDRESS = 0x77;
+
+#elif defined(USE_BOARD_ESP32_S3_ZERO)
+
+////////////////
+// ESP32-S3-Zero
+////////////////
+// ADC pin used to measure battery voltage
+const uint8_t PIN_BAT_ADC  = A2; // A0 for micro-usb firebeetle (Extra circuitry needed if you want to use this)
+// Pins for E-Paper Driver Board
+const uint8_t PIN_EPD_BUSY = 4; // 5 for micro-usb firebeetle
+const uint8_t PIN_EPD_CS   = 10;
+const uint8_t PIN_EPD_RST  = 5;
+const uint8_t PIN_EPD_DC   = 6;
+const uint8_t PIN_EPD_SCK  = 12;
+const uint8_t PIN_EPD_MISO = 19; // 19 Master-In Slave-Out not used, as no data from display
+const uint8_t PIN_EPD_MOSI = 11; // DIN
+const uint8_t PIN_EPD_PWR  = 7; // Irrelevant if directly connected to 3.3V
+// I2C Pins used for BME280
+const uint8_t PIN_BME_SDA = 8;
+const uint8_t PIN_BME_SCL = 9;
+const uint8_t PIN_BME_PWR = 13;   // Irrelevant if directly connected to 3.3V
+const uint8_t BME_ADDRESS = 0x76; // If sensor does not work, try 0x77
+// I2C Pins used for AHT20+BMP280
+const uint8_t PIN_AHT_SDA = 8;
+const uint8_t PIN_AHT_SCL = 9;
+const uint8_t PIN_AHT_PWR = 13;   // Irrelevant if directly connected to 3.3V
+const uint8_t AHT_ADDRESS = 0x38;
+const uint8_t BMP_ADDRESS = 0x77;
+
+#else
+    #error "Define board in platformio.ini file!"
+#endif
+
 
 // WIFI
-const char *WIFI_SSID     = "ssid";
-const char *WIFI_PASSWORD = "password";
+const char *WIFI_SSID     = "ssid here";
+const char *WIFI_PASSWORD = "passhrase here";
 const unsigned long WIFI_TIMEOUT = 10000; // ms, WiFi connection timeout.
 
 // HTTP
@@ -58,7 +127,7 @@ const unsigned HTTP_CLIENT_TCP_TIMEOUT = 10000; // ms
 
 // OPENWEATHERMAP API
 // OpenWeatherMap API key, https://openweathermap.org/
-const String OWM_APIKEY   = "abcdefghijklmnopqrstuvwxyz012345";
+const String OWM_APIKEY   = "XXXXX";
 const String OWM_ENDPOINT = "api.openweathermap.org";
 // OpenWeatherMap One Call 2.5 API is deprecated for all new free users
 // (accounts created after Summer 2022).
@@ -79,25 +148,25 @@ const String OWM_ONECALL_VERSION = "3.0";
 // LOCATION
 // Set your latitude and longitude.
 // (used to get weather data as part of API requests to OpenWeatherMap)
-const String LAT = "40.7128";
-const String LON = "-74.0060";
+const String LAT = "29.7283";
+const String LON = "-95.8613";
 // City name that will be shown in the top-right corner of the display.
-const String CITY_STRING = "New York";
+const String CITY_STRING = "CCR - Fulshear, TX";
 
 // TIME
 // For list of time zones see
 // https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
-const char *TIMEZONE = "EST5EDT,M3.2.0,M11.1.0";
+const char *TIMEZONE = "CST6CDT,M3.2.0,M11.1.0";
 // Time format used when displaying sunrise/set times. (Max 11 characters)
 // For more information about formatting see
 // https://man7.org/linux/man-pages/man3/strftime.3.html
-// const char *TIME_FORMAT = "%l:%M%P"; // 12-hour ex: 1:23am  11:00pm
-const char *TIME_FORMAT = "%H:%M";   // 24-hour ex: 01:23   23:00
+const char *TIME_FORMAT = "%l:%M%P"; // 12-hour ex: 1:23am  11:00pm
+// const char *TIME_FORMAT = "%H:%M";   // 24-hour ex: 01:23   23:00
 // Time format used when displaying axis labels. (Max 11 characters)
 // For more information about formatting see
 // https://man7.org/linux/man-pages/man3/strftime.3.html
-// const char *HOUR_FORMAT = "%l%P"; // 12-hour ex: 1am  11pm
-const char *HOUR_FORMAT = "%H";      // 24-hour ex: 01   23
+const char *HOUR_FORMAT = "%l%P"; // 12-hour ex: 1am  11pm
+// const char *HOUR_FORMAT = "%H";      // 24-hour ex: 01   23
 // Date format used when displaying date in top-right corner.
 // For more information about formatting see
 // https://man7.org/linux/man-pages/man3/strftime.3.html
@@ -106,7 +175,8 @@ const char *DATE_FORMAT = "%a, %B %e"; // ex: Sat, January 1
 // of the screen.
 // For more information about formatting see
 // https://man7.org/linux/man-pages/man3/strftime.3.html
-const char *REFRESH_TIME_FORMAT = "%x %H:%M";
+const char *REFRESH_TIME_FORMAT = "%x %l:%M%P";
+// const char *REFRESH_TIME_FORMAT = "%x %H:%M";
 // NTP_SERVER_1 is the primary time server, while NTP_SERVER_2 is a fallback.
 // pool.ntp.org will find the closest available NTP server to you.
 const char *NTP_SERVER_1 = "pool.ntp.org";
