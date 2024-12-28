@@ -15,20 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#define USE_BME 0
-#define USE_AHT 1
-
 #include <Arduino.h>
-
-#if USE_BME
-#include <Adafruit_BME280.h>
-#include <Adafruit_Sensor.h>
-#endif
-
-#if USE_AHT
-#include <Adafruit_BMP280.h>
-#include <Adafruit_AHTX0.h>
-#endif
 
 #include <Preferences.h>
 #include <time.h>
@@ -42,11 +29,22 @@
 #include "display_utils.h"
 #include "icons/icons_196x196.h"
 #include "renderer.h"
+
 #if defined(USE_HTTPS_WITH_CERT_VERIF) || defined(USE_HTTPS_WITH_CERT_VERIF)
   #include <WiFiClientSecure.h>
 #endif
 #ifdef USE_HTTPS_WITH_CERT_VERIF
   #include "cert.h"
+#endif
+
+#if defined(USE_SENSOR_BME280)
+  #include <Adafruit_BME280.h>
+  #include <Adafruit_Sensor.h>
+#elif defined(USE_SENSOR_AHT20_PLUS_BMP280)
+  #include <Adafruit_BMP280.h>
+  #include <Adafruit_AHTX0.h>
+#else
+    #error "Define sensor to use!"
 #endif
 
 // too large to allocate locally on stack
@@ -300,7 +298,7 @@ void setup()
   float inHumidity = NAN;
   float inPressure = NAN;
 
-#if USE_BME
+#if defined(USE_SENSOR_BME280)
 
   // GET INDOOR TEMPERATURE AND HUMIDITY, start BME280...
   pinMode(PIN_BME_PWR, OUTPUT);
@@ -337,9 +335,7 @@ void setup()
   }
   digitalWrite(PIN_BME_PWR, LOW);
 
-#endif
-
-#if USE_AHT
+#elif defined(USE_SENSOR_AHT20_PLUS_BMP280)
 
   // GET INDOOR TEMPERATURE AND HUMIDITY, start AHT20+BMP280...
   pinMode(PIN_AHT_PWR, OUTPUT);
@@ -409,6 +405,9 @@ void setup()
 
   digitalWrite(PIN_AHT_PWR, LOW);
   Serial.println("Done with AHT20+BMP280.");
+
+#else
+    #error "Define sensor to use!"
 #endif
 
   String refreshTimeStr;

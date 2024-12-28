@@ -21,6 +21,9 @@
 #include <cstdint>
 #include <Arduino.h>
 
+//#define USE_SENSOR_BME280
+#define USE_SENSOR_AHT20_PLUS_BMP280
+
 // E-PAPER PANEL
 // This project supports the following E-Paper panels:
 //   DISP_BW_V2 - 7.5in e-Paper (v2)      800x480px  Black/White
